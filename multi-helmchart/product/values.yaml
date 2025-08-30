@@ -11,7 +11,7 @@ productService:
       aiServiceUrl: http://ai-service:5001/
     image:
       repository: e880613/product
-      tag: v1
+      tag: 627
     resources:
       limits:
         cpu: 2m
