@@ -180,53 +180,42 @@
     minikube
     docker desktop
     docker hub
-    git hub
+    git hub 
     kubectl
     Argo CD   
 
-# Step 1: Start Minikube
+# Install and Access Argo CD
 
-    First, start Minikube. 
+    a. Create namespace for Argo CD
 
-    minikube start    
+        kubectl create namespace argocd
 
-# Step 2: Create a Namespace for Argo CD
+    b. Install Argo CD
 
-    Create a separate namespace for Argo CD.
+        kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-    kubectl create namespace argocd
+    c. Expose Argo CD API server
+
+        kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+    d. Get initial admin password
+
+        kubectl get secret argocd-initial-admin-secret -n argocd \
+          -o jsonpath="{.data.password}" | base64 -d; echo
+
+    e. Browse and Login
+
+        https://localhost:8080/
+
+    f. Login to Argo CD from command line
+
+        argocd login localhost:8080 --username admin --password <output from step d> --insecure
     
-# Step 3: Install Argo CD
-    
-    Install Argo CD
+    g. Connect to the git ripository
 
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+      Connect a Git repository to Argo CD. This repository should contain the Kubernetes manifests for the applications you want to deploy.
 
-    kubectl get all -n argocd
-
-# Step 4: Expose the Argo CD Server
-
-    To access the Argo CD web interface, expose the Argo CD server using the kubectl port-forward command:
-
-    kubectl port-forward svc/argocd-server -n argocd 8080:443
-
-    This command forwards the port 8080 on the local machine to port 443 of the Argo CD server.
-
-# Step 5: Log in to Argo CD
-
-    Browse to https://localhost:8080
-
-    Retrieve the password using the following command:
-
-    kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d; echo
-
-    The output will be the name of the Argo CD server pod. Use this name as the password. The default username is admin.
-
-# Step 6: Connect a Git Repository
-
-    Connect a Git repository to Argo CD. This repository should contain the Kubernetes manifests for the applications you want to deploy.
-
-    In the Argo CD web interface, Select Setting, Repository, Connect Repository
+      In the Argo CD web interface, Select Setting, Repository, Connect Repository
 
 # Cretae Argo CD app
     
@@ -238,104 +227,20 @@
 
     - Manifest (CRD - Application)
 
-      kubectl apply -f ./argocd/applications/single-manifests.yaml -n argocd
-      kubectl apply -f ./argocd/applications/single-helmchart.yaml -n argocd
-      kubectl apply -f ./argocd/applications/kustomize-manifests.yaml -n argocd
-      kubectl apply -f ./argocd/applications/helm-kustomize.yaml -n argocd
-      kubectl apply -f ./argocd/applications/multi-environment-helmchart.yaml -n argocd
-
-      # App of apps (deploy multiple services/apps using a root/parent argo CD manifest)
-      kubectl apply -f ./apps/app-of-apps.yaml -n argocd
-      kubectl apply -f ./apps-helm/app-of-apps.yaml -n argocd
-      kubectl apply -f ./apps-kustomize-manifests-prod/app-of-apps.yaml -n argocd      
-
+      kubectl apply -f ./argocd/applications/config-argocd-app.yaml -n argocd
+      kubectl apply -f ./argocd/applications/rabbitmq-argocd-app.yaml -n argocd
+      kubectl apply -f ./argocd/applications/order-argocd-app.yaml -n argocd
+      kubectl apply -f ./argocd/applications/product-argocd-app.yaml -n argocd
+      kubectl apply -f ./argocd/applications/store-front-argocd-app.yaml -n argocd    
 
       # Delete the services/apps
-      kubectl delete -f ./argocd/applications/single-manifests.yaml -n argocd
-      kubectl delete -f ./argocd/applications/single-helmchart.yaml -n argocd
-      kubectl delete -f ./argocd/applications/kustomize-manifests.yaml -n argocd
-      kubectl delete -f ./argocd/applications/helm-kustomize.yaml -n argocd
-      kubectl delete -f ./argocd/applications/multi-environment-helmchart.yaml -n argocd
 
-      kubectl delete -f ./apps/app-of-apps.yaml -n argocd
-      kubectl delete -f ./apps-helm/app-of-apps.yaml -n argocd  
-      kubectl delete -f ./apps-kustomize-manifests-prod/app-of-apps.yaml -n argocd    
+      kubectl delete -f ./argocd/applications/config-argocd-app.yaml -n argocd
+      kubectl delete -f ./argocd/applications/rabbitmq-argocd-app -n argocd
+      kubectl delete -f ./argocd/applications/order-argocd-app.yaml -n argocd
+      kubectl delete -f ./argocd/applications/product-argocd-app -n argocd
+      kubectl delete -f ./argocd/applications/store-front-argocd-app.yaml -n argocd     
 
-    - Manifest (CRD - ApplicationSet)
-
-      kubectl apply -f ./appsets/single-manifests-appset.yaml
-      kubectl apply -f ./appsets/multi-manifests-appset.yaml
-
-      # Delete the services/apps
-      kubectl delete -f ./appsets/single-manifests-appset.yaml
-      kubectl delete -f ./appsets/multi-manifests-appset.yaml
-
-# Step 7: Sync the Application
+# Sync the Application
 
     After creating the application, you will see it listed on the dashboard. 
-
-# minikube cluster
-
-  alias k=kubectl
-
-  k create ns single-manifests 
-  k create ns multi-manifests
-  k create ns single-helmchart
-  k create ns multi-helmchart
-  k create ns kustomize-manifests
-
-
-# Docker Build and Push to Docker Hub
-
-    # Order Service
-    docker build -t order ./app/order-service 
-    docker tag order:latest e880613/order:v1
-    docker push e880613/order:v1
-
-    # Product Service
-    docker build -t product ./app/product-service 
-    docker tag product:latest e880613/product:v1
-    docker push e880613/product:v1
-
-    # Store Front Service
-    docker build -t store-front ./app/store-front 
-    docker tag store-front:latest e880613/store-front:v1
-    docker push e880613/store-front:v1 
-
-
-kubectl apply -f ./appsets/single-manifests-appset.yaml
-kubectl delete -f ./appsets/single-manifests-appset.yaml
-
-kubectl apply -f ./appsets/multi-manifests-appset.yaml
-kubectl delete -f ./appsets/multi-manifests-appset.yaml
-
-kubectl apply -f ./appsets/multi-env-multi-manifests-appset.yaml
-kubectl delete -f ./appsets/multi-env-multi-manifests-appset.yaml
-
-
-kubectl apply -f ./appsets/appset.yaml
-kubectl delete -f ./appsets/appset.yaml
-
-kubectl delete -f ./appsets/multi-env-multi-manifests-appset.yaml
-
-
-kubectl describe applicationsets.argoproj.io -n argocd matrix-namespaces-example
-
-
-argocd appset get-items -f ./appsets/multi-manifests-appset.yaml
-
-argocd appset template -f ./appsets/multi-manifests-appset.yaml
-
-kubectl apply -f ./appsets/multi-manifests-appset.yaml --dry-run=client -o yaml
-
-
-argocd appset get ./appsets/appset.yaml -o yaml
-argocd appset get ./appsets/multi-manifests-appset.yaml
-
-kubectl apply -f ./appsets/appset.yaml --dry-run=client -o yaml
-
-argocd login localhost:8080 --username admin --password lA2zNg2gO0JwB693 --insecure
-
-
-kubectl apply -f ./appsets/test.yaml
-kubectl apply -f ./appsets/test.yaml --dry-run=client -o yaml
