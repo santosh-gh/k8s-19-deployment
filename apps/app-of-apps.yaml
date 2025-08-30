@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-of-apps
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/santosh-gh/k8s-17-deployment.git
+    targetRevision: HEAD
+    path: apps/microservices
+    directory:
+      recurse: true   # ensures all child application YAMLs inside are applied
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: multi-manifests2
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

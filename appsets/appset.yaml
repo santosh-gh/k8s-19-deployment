@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: microservices-matrix
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - matrix:
+      generators:
+      - list:
+          elements:
+          - app: config
+          - app: rabbitmq
+          - app: order
+          - app: product
+          - app: store-front
+
+      - list:
+          elements:
+          - namespace: dev
+          - namespace: test
+          - namespace: prod
+
+  template:
+    metadata:
+      name: '{{.app}}-{{.namespace}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/santosh-gh/k8s-18-deployment.git
+        targetRevision: HEAD
+        path: multi-manifests/'{{.app}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{.namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true

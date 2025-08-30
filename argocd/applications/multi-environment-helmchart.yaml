@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: multi-environment-helmchart
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/santosh-gh/k8s-17-deployment.git
+    targetRevision: HEAD
+    path: multi-environment-helmchart/product
+    helm:
+      valueFiles:
+        - prod-values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: multi-environment-helmchart
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

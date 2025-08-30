@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: single-helmchart
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/santosh-gh/k8s-17-deployment.git
+    targetRevision: HEAD
+    path: single-helmchart
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: single-helmchart
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

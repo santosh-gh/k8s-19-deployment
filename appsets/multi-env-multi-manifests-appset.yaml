@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: multi-env-multi-manifests
+spec:
+  generators:
+  - matrix:
+      generators:
+      - git:
+          repoURL: https://github.com/santosh-gh/k8s-18-deployment.git
+          revision: HEAD
+          directories:
+          - path: multi-manifests/*
+      - list:
+          elements:
+          - env: dev
+          - env: test
+          - env: prod
+  template:
+    metadata:
+      name: '{{path.basename}}-{{env}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/santosh-gh/k8s-18-deployment.git
+        targetRevision: HEAD
+        path: '{{path.basename}}'
+      destination:
+        server:  https://kubernetes.default.svc
+        namespace:  '{{env}}'
