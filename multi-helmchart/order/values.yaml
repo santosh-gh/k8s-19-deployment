@@ -12,7 +12,7 @@ orderService:
       orderQueueUsername: username
     image:
       repository: e880613/order
-      tag: v1
+      tag: 615
     resources:
       limits:
         cpu: 75m
