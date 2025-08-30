@@ -9,7 +9,7 @@ storeFront:
   storeFront:
     image:
       repository: e880613/store-front
-      tag: v1
+      tag: 629
     resources:
       limits:
         cpu: "1"
