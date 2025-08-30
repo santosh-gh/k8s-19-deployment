@@ -1,6 +1,0 @@
-resources:
-  - ../../base
-patches:
-- path: prod-values.yaml
-  target:
-    kind: Deployment
