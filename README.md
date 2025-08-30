@@ -166,6 +166,13 @@
     GitHub:  https://github.com/santosh-gh/k8s-18
     YouTube: https://www.youtube.com/watch?v=GYMY4ZQ7V9o&list=PLr6ErUeFySVug9VG73_W2MypRez_ZycWh&index=16
 
+    Part19: ArgoCD (Automate deployment using Azure Pipeline)
+            Create Argo CD applications using manifests
+            Automate deployment using Azure Pipeline
+           
+    GitHub:  https://github.com/santosh-gh/k8s-19-deployment.git
+    YouTube: https://www.youtube.com/watch?v=GYMY4ZQ7V9o&list=PLr6ErUeFySVug9VG73_W2MypRez_ZycWh&index=16
+
 # Architesture
 
 ![Store Architesture](aks-store-architecture.png)
