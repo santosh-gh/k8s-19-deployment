@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/santosh-gh/k8s-19-deployment.git
     targetRevision: HEAD
-    path: multi-manifests/rabbitmq
+    path: multi-helmchart/rabbitmq
   destination:
     server: https://kubernetes.default.svc
     namespace: dev

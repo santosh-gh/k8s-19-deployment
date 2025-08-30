@@ -236,9 +236,9 @@
       # Delete the services/apps
 
       kubectl delete -f ./argocd/applications/config-argocd-app.yaml -n argocd
-      kubectl delete -f ./argocd/applications/rabbitmq-argocd-app -n argocd
+      kubectl delete -f ./argocd/applications/rabbitmq-argocd-app.yaml -n argocd
       kubectl delete -f ./argocd/applications/order-argocd-app.yaml -n argocd
-      kubectl delete -f ./argocd/applications/product-argocd-app -n argocd
+      kubectl delete -f ./argocd/applications/product-argocd-app.yaml -n argocd
       kubectl delete -f ./argocd/applications/store-front-argocd-app.yaml -n argocd     
 
 # Sync the Application
